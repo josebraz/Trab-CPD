@@ -30,30 +30,43 @@ bool Hash::put(Element name){
     return true;
 }
 
-int Hash::collision(int hash_id, string word){
-    Element in_test = this->table->at(hash_id);
-    while (!in_test.empty() && word != in_test.get_word()){
-        hash_id++; // colisoes
-        this->colisoes++;
-        if (hash_id >= this->max_size) hash_id=0; // volta do inicio
-        in_test = this->table->at(hash_id);
-    }
-    return hash_id;
+int Hash::get_number_of_char(char c){
+    if(c >= 'a' && c <= 'z') return c - 'a' + 1;    // letras minusculas
+    if(c >= 'A' && c <= 'Z') return c - 'A' + 1;    // letras maiusculas
+    if(c >= '0' && c <= '9') return (c - '0') + ('z'-'a') + 1; // numeros
+    return 1; // outras coisas
 }
 
-int Hash::get_number_of_char(char c){
-    if(c >= 'a' && c <= 'z') return c - 'a' + 1;
-    if(c >= 'A' && c <= 'Z') return c - 'A' + 1;
-    return 0;
+int Hash::h1(string word){
+    double h1 = 0;
+    for(int i=0; i<word.size(); i++)
+        h1 += pow(get_number_of_char(word[i]), 9);
+
+    h1 = fmod(h1, this->max_size);
+    return (int)h1;
+}
+
+int Hash::h2(string word){
+    double h2 = 0;
+    for(int i=0; i<word.size(); i++)
+        h2 += pow(get_number_of_char(word[i]), 7);
+
+    h2 = fmod(h2, 17939);
+    return (int)h2;
 }
 
 int Hash::hashing(string word){
-    double ret = 0;
-    for(int i=0; i<word.size(); i++)
-        ret += pow(get_number_of_char(word[i]), 9)*(i+1);
-    ret = fmod(ret, this->max_size);
-    ret = collision(ret, word);
-    return (int)ret;
+    int hash_id, h1 = this->h1(word), h2 = this->h2(word);
+    int i = 0;
+    Element in_test;
+    // repete até que ache um lugar na tabela
+    do{
+        hash_id = (h1 + i*h2 + (int)pow(i, 2)) % this->max_size;
+        in_test = this->table->at(hash_id);
+        i++;
+    } while(!in_test.empty() && word != in_test.get_word());
+    this->colisoes += (i-1);    // salva as colisoes
+    return (int)hash_id;
 }
 
 float Hash::get_average(string word){
@@ -80,14 +93,6 @@ int Hash::get_occ(string word){
         return -1;          // não achou a palavra na tabela
 }
 
-// Quanto mais ocorencias a palavra tem, mais conhecemos ela
-float occ_to_reliability(int occ){
-    float temp = log(occ/0.15) / 0.08;
-    if (temp > 100) return 100;
-    if (temp < 0) return 0;
-    return temp;
-}
-
 // Quanto maior o desvio padrão, menos confiável a amostra é
 float deviation_to_weight(float deviation){
     float temp = log(deviation/2) / -0.04;
@@ -107,10 +112,9 @@ float Hash::get_score_phrase(string phrase){
         if (score_word != -1){
             // peso obtido a partir do desvio
             float weight = deviation_to_weight(get_deviation(words[i]));
-            // confiabilidade da amostra
-            //float reliability = occ_to_reliability(get_occ(words[i]));
-            sum_words += score_word * weight; //+ reliability);
-            total_deviation += weight; // + reliability;
+            
+            sum_words += score_word * weight;
+            total_deviation += weight;
         }
     }
     if (total_deviation != 0)

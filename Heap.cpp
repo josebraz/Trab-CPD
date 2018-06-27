@@ -134,7 +134,12 @@ Element Heap::remove_max_element(){
 }
 
 void Heap::print(){
- 	for (int i = 0; i < get_size(); i++){
+ 	for (int i = 0; i < get_size(); i++)
 		cout << heap_vector->at(i);
-	}
+}
+
+void Heap::inverse_print(int k){
+	int total = get_size();
+ 	for (int i = 1; i <= k; i++)
+		cout << i << '\t' << heap_vector->at(total-i);
 }

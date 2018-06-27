@@ -10,12 +10,10 @@
 
 using namespace std;
 
-const string NEGATIVES[] = {"no", "nothing", "nobody", "never"};
-
 class ArchText{
 public:
     static void read_file(vector<vector<string> > &, const string);
-        static void read_file(vector<string> &, const string);
+    static void read_file(vector<string> &, const string);
     static void construct_hash(vector<vector<string> > &, Hash &);
     static void construct_trie(vector<vector<string> > &, Trie &);
     static bool binary_search(vector<string>, string);

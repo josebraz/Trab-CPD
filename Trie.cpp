@@ -54,6 +54,7 @@ void Trie::insert_node(string word, InfoComment info, int i){
         this->add_info(info); // adiciona mais informações sobre a palavra
 }
 
+// lista as informações da word, de acordo com a operacao
 void Trie::get_info(string word, int op){
     if (word.size() > 0){ // cria mais nodos de corte
         int index_p = get_index(word[0]);    // calcula o indice
@@ -65,37 +66,49 @@ void Trie::get_info(string word, int op){
         this->print_comments(op);
 }
 
-// Imprime todos os comentarios da palavra
+// Imprime os comentarios da palavra de acordo com op:
+// op < 0 => negativas
+// op > 0 => positivas
+// op = 0 => todas
 void Trie::print_comments(int op){
     for(int i=0; i<this->v_comments->size(); i++)
-        if(op < 0 && this->v_comments->at(i).rating < 2)
+        if(op < 0 && this->v_comments->at(i).rating < 2) // imprime so negativas
             this->v_comments->at(i).print();
-        else if(op > 0 && this->v_comments->at(i).rating > 2)
+        else if(op > 0 && this->v_comments->at(i).rating > 2) // positivas
             this->v_comments->at(i).print();
-        else if (op == 0)
+        else if(op == 0)    // imprime todas
             this->v_comments->at(i).print();
 }
 
 // imprime todas as palavras começando com word
-void Trie::print_prefix(string word, int i){
-    if (i < word.size()){ // cria mais nodos de corte
+bool Trie::print_prefix(string word, int i){
+    bool was_printed = false;
+    // aprofunda na árvore ate o ramo de palavras que comecem com word
+    if (i < word.size()){
         int index_p = get_index(word[i]);    // calcula o indice
         if (index_p < 26 && this->p_sons->at(index_p) != NULL)
-            this->p_sons->at(index_p)->print_prefix(word, ++i);
-    } else
-        this->print(word);
+            was_printed = this->p_sons->at(index_p)->print_prefix(word, ++i)
+                          || was_printed;
+    } else // o mais fundo possivel, printa os ramos com o prefixo word
+        was_printed = this->print(word);
+    return was_printed;
 }
 
-// imprime a arvore toda
-void Trie::print(string prefix){
-    for(int i=0; i<26; i++){
-        Trie* temp = this->p_sons->at(i);
-        if(temp != NULL){
+// imprime recursivamente toda a árvore tendo this como raiz e, opcionalmente,
+// adiciona a string prefix no inicio da palavra
+bool Trie::print(string prefix, bool was_printed){
+    // verifica se this é uma palavra completa
+    if (this->is_word){
+        cout << prefix << endl;
+        was_printed = true;     // marca como printado
+    }
+    for(int i=0; i<26; i++){                // roda para todos seus filhos
+        Trie* temp = this->p_sons->at(i);   // navega para os filhos
+        if(temp != NULL){                   // condição de parada
             prefix += (char)('a'+i);
-            if(temp->is_word)
-                cout << prefix << endl;
-            temp->print(prefix);
+            was_printed = temp->print(prefix, was_printed) || was_printed;
             prefix.erase(prefix.end()-1);
         }
     }
+    return was_printed;
 }

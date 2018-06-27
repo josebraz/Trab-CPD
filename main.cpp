@@ -24,18 +24,16 @@ void make_test(Hash hash_table){
         for(int j=2; j<vv_teste[i].size()-1; j++) // pula os IDs
             phrase += vv_teste[i][j] + " ";
         phrase += vv_teste[i].back();
-
         int score = round(hash_table.get_score_phrase(phrase));
         file_out << vv_teste[i][0] << "," << score << endl;
-
     }
-
 }
 
 int main(){
     vector<vector<string> > vv_s;
-    Hash hash_table(30000);
+    Hash hash_table(29921);
     Trie trie_tree;
+    int k;      // usado como argumento da impressao da Heap
 
     string phrase, word;
     float score, deviation;
@@ -50,9 +48,9 @@ int main(){
     // construtor das estruturas
     ArchText::construct_hash(vv_s, hash_table);
     ArchText::construct_trie(vv_s, trie_tree);
-    Heap heap_trie_occ(hash_table.get_table(), 0);
-    Heap heap_trie_pos(hash_table.get_table(), 1);
-    Heap heap_trie_neg(hash_table.get_table(), 2);
+    Heap heap_tree_occ(hash_table.get_table(), 0);
+    Heap heap_tree_pos(hash_table.get_table(), 1);
+    Heap heap_tree_neg(hash_table.get_table(), 2);
 
     while(true){
         system("clear");
@@ -108,18 +106,25 @@ int main(){
         case 3: cout << "Diga sua palavra em ingles: ";
                 cin >> word;
                 transform(word.begin(), word.end(), word.begin(), ::tolower);
-                trie_tree.print_prefix(word);
+                if(!trie_tree.print_prefix(word)) // se nao foi impresso algo
+                    cout << "Não foram achadas palavras começando com " << word;
                 break;
-        case 4: heap_trie_occ.sort();
-                heap_trie_occ.print();
+        case 4: cout << "Informe o k: ";
+                cin >> k;
+                heap_tree_occ.sort();   // heap de ocorrencias
+                heap_tree_occ.inverse_print(k);
                 break;
-        case 5: heap_trie_pos.sort();
-                heap_trie_pos.print();
+        case 5: cout << "Informe o k: ";
+                cin >> k;
+                heap_tree_pos.sort();   // heap positivas
+                heap_tree_pos.inverse_print(k);
                 break;
-        case 6: heap_trie_neg.sort();
-                heap_trie_neg.print();
+        case 6: cout << "Informe o k: ";
+                cin >> k;
+                heap_tree_neg.sort();   // heap negativas
+                heap_tree_neg.inverse_print(k);
                 break;
-        case 7: hash_table.print_table();
+        case 7: hash_table.print_table();   // imprime a hashtable
                 break;
         case 8: cout << "Efetuando o teste..." << endl;
                 make_test(hash_table);
@@ -127,8 +132,7 @@ int main(){
                 break;
         default: break;
         }
-        cin.get();
-        cin.get();
+        cin.get();  // limpa o buffer
+        cin.get();  // espera uma tecla
     }
-    //hash_table.print_table();
 }

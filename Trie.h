@@ -35,9 +35,9 @@ public:
     void add_info(InfoComment);
     void insert_node(string, InfoComment, int = 0); // insere uma nova palavra na arvore
     void get_info(string, int = 0);      // imprime as informações da palavra
-    void print_prefix(string, int = 0); // imprime todas as palavras com o prefixo
+    bool print_prefix(string, int = 0); // imprime todas as palavras com o prefixo
     void print_comments(int = 0);      // imprime as informações em v_comments
-    void print(string = "");    // imprime a arvore a partir de "this"
+    bool print(string = "", bool = false); // imprime a arvore a partir de "this"
     int get_index(char);
 };
 

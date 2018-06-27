@@ -20,7 +20,6 @@ private:
 
 public:
     Hash(int);
-    int collision(int, string);
     float get_average(string);
     int get_occ(string);    // retorna quantas vezes a palavra apareceu
     float get_deviation(string);
@@ -28,6 +27,8 @@ public:
     int get_number_of_char(char);
     vector<Element>* get_table();
     int hashing(string);
+    int h1(string);
+    int h2(string);
     void print_table();
     bool put(Element name);
 

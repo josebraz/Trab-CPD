@@ -41,6 +41,7 @@ public:
 	void build();              // mantem a propriedade de heap
 	void sort();               // ordena o vetor
 	void print();              // printa o vetor
+	void inverse_print(int);   // printa o vetor ao contrario
 	void insert(Element);      // insere um elemento
 	Element max_element();     // retorna o elemento maximo
 	Element remove_max_element();
